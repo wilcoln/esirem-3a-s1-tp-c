@@ -1,18 +1,16 @@
 CC=gcc
-CFLAGS=-Wall
-LDFLAGS=
-SRCS=main.c
-OBJFILES=main.o
-TARGET=main
+TARGET=prog
+SRCS=main.c events.c
+OBJFILES=main.o events.o
+FLAGS=-Wall
+
 all: $(TARGET)
-	$(TARGET): $(OBJFILES)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
-.c.o:
-	${CC} ${CFLAGS} ${INCLUDES} -c $<
-clean:
-	rm -f $(OBJFILES) $(TARGET)
-depend:
-	makedepend -l. $(SRCS)
-exe: $(TARGET)
 	./$(TARGET)
 
+$(TARGET): $(OBJFILES) $(SRCS)
+	$(CC) $(FLAGS) $(OBJFILES) -o $(TARGET)
+
+$(OBJFILES): $(SRCS)
+	$(CC) -c $(SRCS)
+clean: 
+	rm -rf $(TARGET) $(OBJFILES)

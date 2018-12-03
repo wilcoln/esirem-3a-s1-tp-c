@@ -4,10 +4,9 @@
 
 #define N 10
 
-const iterations_nb = 10;
+const int iterations_nb = 10;
 
 int main(){
-	remplissage_dates(N);
 	event events[N];
 	create_events(N,events);
 	display_events(N,events);

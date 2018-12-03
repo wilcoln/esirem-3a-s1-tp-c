@@ -11,7 +11,7 @@ typedef struct event{
 	date date_of_event;
 } event;
 
-void remplissage_dates(int n);
+date* remplissage_dates(int n, date* dates);
 void stringify(date d, char date_str[]);
 int index_of_month(char* month);
 void create_events(int n, event events[]);

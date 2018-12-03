@@ -6,8 +6,6 @@
 
 const char MONTHS[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
 
-date* dates;
-
 // --- Fonctions utilitaires
 int index_of_month(char* month){
 	int i = 0;
@@ -21,11 +19,10 @@ int numbify(date d){
 }
 void stringify(date d, char date_str[]){
 	sprintf(date_str, "%d",numbify(d));
-	date_str[9] = '\0';
 }
 // ---- Fin Fonctions utilitaires 
 
-void remplissage_dates(int n){
+date* remplissage_dates(int n, date* dates){
 	srand(time(NULL));
 	int index_month;
 	dates = malloc(n*sizeof(date));
@@ -37,12 +34,14 @@ void remplissage_dates(int n){
 		dates[i].month[strlen(MONTHS[index_month])] = '\0';
 		dates[i].year = 1999 + rand()%101;
 	}
+	return dates;
 		
 }
 
 void create_events(int n, event events[]){
 	int i;
 	char date_str[9];
+	date* dates = remplissage_dates(n, dates);
 	for(i = 0; i < n; i++){
 		events[i].date_of_event = dates[i];
 		stringify(dates[i],date_str);
@@ -113,7 +112,7 @@ int partition(event events[], int a, int b){
 		if(compare_events(events[pivot],events[i]) == 1){
 			tmp = events[i];
 			events[i] = events[pivot+1];
-			events[pivot] = events[pivot + 1];
+			events[pivot+1] = events[pivot];
 			events[pivot] = tmp;
 			pivot++;
 		}
