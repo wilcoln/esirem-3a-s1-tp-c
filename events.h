@@ -1,20 +1,33 @@
 #include <stdio.h>
 
+//================ Définition des structures =====================
+
+/**
+ * Défintion de la structure date 
+ */
 typedef struct date{
 	int day;
 	char month[10];
 	int year;
 } date;
 
+
+/**
+ * Défintion de la structure date 
+ */
 typedef struct event{
 	char description[128];
 	date date_of_event;
 } event;
+
+//================ Fin définition des structures =================
+
+//
 typedef enum Tri {BASIC,SELECTION,BUBBLE,INSERTION,QUICK} Tri;
 
 
 
-date* remplissage_dates(int n, date* dates);
+date* generate_dates(int n);
 void stringify(date d, char date_str[]);
 int index_of_month(char* month);
 void create_events(int n, event events[]);
@@ -23,6 +36,7 @@ void display_event(event e);
 int compare_dates(date d1, date d2);
 int compare_events(event e1, event e2);
 void swap_events(event events[], int n, int i);
+void selection_sort(event events[], int n);
 void basic_sort(event events[], int n);
 void bubble_sort(event events[], int n);
 void insertion_sort(event events[], int n);
@@ -39,6 +53,7 @@ typedef struct perf
 	char algo[128];
 	int data_size;
 	clock_t coups_nb;
+	double ecart_type;
 	int swap_nb;
 	int compare_nb;
 	int iterations_nb;

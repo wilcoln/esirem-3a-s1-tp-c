@@ -5,12 +5,16 @@ OBJFILES=main.o events.o
 FLAGS=-Wall
 
 all: $(TARGET)
-	./$(TARGET)
 
-$(TARGET): $(OBJFILES) $(SRCS)
+$(TARGET): $(OBJFILES)
 	$(CC) $(FLAGS) $(OBJFILES) -o $(TARGET)
 
 $(OBJFILES): $(SRCS)
 	$(CC) -c $(SRCS)
 clean: 
-	rm -rf $(TARGET) $(OBJFILES)
+	rm -rf $(TARGET) $(OBJFILES) *.csv
+
+depend: 
+		make depend -l. $(SRCS)
+exe: $(TARGET)
+	./$(TARGET)
