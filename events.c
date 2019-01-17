@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 #include "events.h"
 
 //======================== Constantes et variables externes ===============================//
@@ -52,19 +53,42 @@ void stringify(date d, char date_str[]){
  * @param : un enter {n}
  * Description: Génère aléatoirement n dates et renvoie un pointeur correspondant au tableau contenant ces dernières  
  */ 
-date* generate_dates(int n){
+date* generate_dates(int n, Case cas){
 	srand(time(NULL));
 	int index_month;
 	date* dates;
 	dates = malloc(n*sizeof(date));
 	int i;
-	for(i = 0; i < n; i++){
-		dates[i].day =  1 + rand()%30;
-		index_month = rand()%11;
-		strcpy(dates[i].month, MONTHS[index_month]);
-		dates[i].month[strlen(MONTHS[index_month])] = '\0';
-		dates[i].year = 1999 + rand()%101;
+	switch(cas){
+		case RANDOM:
+			for(i = 0; i < n; i++){
+				dates[i].day =  1 + rand()%30;
+				index_month = rand()%11;
+				strcpy(dates[i].month, MONTHS[index_month]);
+				dates[i].month[strlen(MONTHS[index_month])] = '\0';
+				dates[i].year = 1999 + rand()%101;
+			}
+		break;
+		case BEST:
+			for(i = 0; i < n; i++){
+				dates[i].day =  1 + rand()%30;
+				index_month = rand()%11;
+				strcpy(dates[i].month, MONTHS[index_month]);
+				dates[i].month[strlen(MONTHS[index_month])] = '\0';
+				dates[i].year = 1999 + i;
+			}
+		break;
+		case WORST:
+			for(i = 0; i < n; i++){
+				dates[i].day =  1 + rand()%30;
+				index_month = rand()%11;
+				strcpy(dates[i].month, MONTHS[index_month]);
+				dates[i].month[strlen(MONTHS[index_month])] = '\0';
+				dates[i].year = (1999 + n) - i;
+			}
+		break;
 	}
+	
 	return dates;
 		
 }
@@ -75,10 +99,22 @@ date* generate_dates(int n){
  * @params : un entier {n} et un tableau d'évènements {events[]} préalablement alloué
  * Description: remplis le tableau events[] avec n évènements créés avec des dates aléatoires 
  */ 
-void create_events(int n, event events[]){
+// void create_events(int n, event events[]){
+// 	int i;
+// 	char date_str[9];
+// 	date* dates = generate_dates(n); // Création des dates aléatoires
+// 	for(i = 0; i < n; i++){
+// 		events[i].date_of_event = dates[i];
+// 		stringify(dates[i],date_str);
+// 		strcpy(events[i].description,"Event-");
+// 		strcat(events[i].description, date_str);
+// 	}
+// }
+
+void create_events(int n, event events[], Case cas){
 	int i;
 	char date_str[9];
-	date* dates = generate_dates(n); // Création des dates aléatoires
+	date* dates = generate_dates(n, cas); // Création des dates aléatoires, pour cas = RANDOM
 	for(i = 0; i < n; i++){
 		events[i].date_of_event = dates[i];
 		stringify(dates[i],date_str);
@@ -227,9 +263,47 @@ void quick_sort(event events[], int a, int b){
 	}
 }
 
+void merge(event events[], int a, int c, int b){
+	 int t1 = c-a+1;
+	 int t2 = b-c;
+	 int k = a, i = 0, j = 0;
+	event sub1[t1];
+	event sub2[t2];
+	for(i = a; i <= c; i++ )
+		sub1[i-a] = events[i];
+	for(i = c+1; i<=b; i++)
+		sub2[i-c-1] = events[i];
+	i=0;
+	for(k = a; k<= b; k++){
+		if( i >  t1 - 1 ){
+			events[k] = sub2[j];
+			j++;
+		}else if(j > t2 - 1){
+			events[k] = sub1[i];
+			i++;
+		}else if( compare_events(sub1[i],sub2[j]) == 1){
+			events[k] = sub2[j];
+			j++;
+		}else{
+			events[k] = sub1[i];
+			i++;
+		}
+	}
+}
+
+void merge_sort(event events[], int a , int b){
+	if(b > a){
+		int mil = (a+b)/2;
+		merge_sort(events, a , mil);
+		merge_sort(events, mil + 1, b);
+		merge(events, a, mil, b);
+	}
+}
+
+
 //Evaluation des performances
-perf evalue_performance(Tri tri, int data_size, int iterations_nb){
-	clock_t t1,t2,t_i; double ecart_type = 0;
+perf evalue_performance(Tri tri, int data_size, int iterations_nb, Case cas){
+	clock_t t1,t2, t[iterations_nb]; double ecart_type = 0;
 	char algo[128];
 	size_t i;
 	//Initialisation des compteurs
@@ -240,12 +314,11 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
-				create_events(data_size,events);
+				create_events(data_size,events, cas);
 				basic_sort(events,data_size);
-				t_i = clock();
-				ecart_type += t_i*t_i;
-
-			}
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
+			};
 			t2 = clock();
 			break;
 		case SELECTION:
@@ -253,8 +326,10 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
-				create_events(data_size,events);
-				basic_sort(events,data_size);	
+				create_events(data_size,events, cas);
+				basic_sort(events,data_size);
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
 			}
 			t2 = clock();
 			break;
@@ -263,8 +338,10 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
-				create_events(data_size,events);
+				create_events(data_size,events, cas);
 				bubble_sort(events,data_size);	
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
 			}
 			t2 = clock();
 			break;
@@ -273,8 +350,10 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
-				create_events(data_size,events);
-				insertion_sort(events,data_size);	
+				create_events(data_size,events, cas);
+				insertion_sort(events,data_size);
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
 			}
 			t2 = clock();
 			break;
@@ -283,8 +362,23 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
-				create_events(data_size,events);
-				quick_sort(events,0,data_size-1);	
+				create_events(data_size,events, cas);
+				quick_sort(events,0,data_size-1);
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
+			}
+			t2 = clock();
+			break;
+
+		case MERGE:
+			strcpy(algo,"MERGE SORT");
+			t1 = clock();
+			for(i=0;i<iterations_nb;i++){
+				event events[data_size];
+				create_events(data_size,events, cas);
+				quick_sort(events,0,data_size-1);
+				t[i] = clock();
+				ecart_type +=t[i]*t[i];
 			}
 			t2 = clock();
 			break;
@@ -296,13 +390,18 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb){
 	new_perf.coups_nb  = (t2-t1)/iterations_nb;
 	new_perf.swap_nb = swap_nb;
 	new_perf.compare_nb = compare_nb;
+	// Calcul de l'écart type
+	ecart_type /= iterations_nb;
+	ecart_type -= new_perf.coups_nb;
+	ecart_type = sqrt(ecart_type);
+	new_perf.ecart_type = ecart_type;
 	strcpy(new_perf.algo, algo);
 	return new_perf;
 	
 }
 void display_performance(perf p){
 	printf("Affichage perf ...\n");
-	printf("> Temps mis par le tri %s avec une taille %d et un nb d'itération %d \n\t %ld coups, nb_swap = %d, nb_compare = %d\n\n", p.algo,  p.data_size, p.iterations_nb, p.coups_nb, p.swap_nb,p.compare_nb);
+	printf("> Temps mis par le tri %s avec une taille %d et un nb d'itération %d \n\t %ld coups, %lf ecart_type, nb_swap = %d, nb_compare = %d\n\n", p.algo,  p.data_size, p.iterations_nb, p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
 	printf("Fin perf\n");
 }
 void record_performance(FILE* file,perf p){
@@ -312,6 +411,6 @@ void record_performance(FILE* file,perf p){
       exit(1);             
    }
    //fprintf(file,"%s,%d,%d,%ld,%d,%d\n",p.algo,p.data_size,p.iterations_nb,p.coups_nb,p.swap_nb,p.compare_nb);
-   fprintf("%d,%d,%ld,%d,%d\n",p.data_size,p.iterations_nb,p.coups_nb,p.swap_nb,p.compare_nb);
+   fprintf(file, "%d,%d,%ld,%lf,%d,%d\n",p.data_size,p.iterations_nb,p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
 }
 
