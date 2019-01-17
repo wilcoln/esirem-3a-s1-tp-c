@@ -22,15 +22,15 @@ typedef struct event{
 
 //================ Fin définition des structures =================
 
-//
-typedef enum Tri {BASIC,SELECTION,BUBBLE,INSERTION,QUICK} Tri;
+typedef enum Tri {BASIC,SELECTION,BUBBLE,INSERTION,QUICK, MERGE} Tri;
+typedef enum Case {RANDOM, BEST, WORST} Case; 
 
 
 
-date* generate_dates(int n);
+date* generate_dates(int n, Case cas);
 void stringify(date d, char date_str[]);
 int index_of_month(char* month);
-void create_events(int n, event events[]);
+void create_events(int n, event events[], Case cas);
 void display_events(int n, event events[]);
 void display_event(event e);
 int compare_dates(date d1, date d2);
@@ -61,5 +61,5 @@ typedef struct perf
 } perf;
 
 void display_performance(perf p);
-perf evalue_performance(Tri tri, int data_size, int iterations_nb);
+perf evalue_performance(Tri tri, int data_size, int iterations_nb, Case cas);
 void record_performance(FILE* file, perf p);
