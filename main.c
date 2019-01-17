@@ -33,66 +33,79 @@ int main(){
 	perf p = evalue_performance(BASIC,100,500);
 	display_performance(p); */
 
+
+// Evaluation random
    FILE *file;
    file = fopen("performances.csv","w");
-   int data_size[7] = {100, 200, 500, 1000,2000,5000,10000};
-  /*  int data_size[200];
+   //int data_size[7] = {100, 200, 500, 1000,2000,5000,10000};
+  int data_size[200];
    int k;
    for(k = 0; k < 200; k++){
 	   data_size[k] = 50*(k+1);
-   } */
-   int iterations_nb[5] = {10, 20, 400, 500, 600};//{100, 200, 400, 500, 600};
+   }
+   int iterations_nb[5] = {50, 20, 400, 500, 600};//{100, 200, 400, 500, 600};
    size_t j,i;
    perf p;
 
-   fprintf(file,"ALGORITHME,DATA SIZE,ITERATIONS,COUPS HORLOGE,SWAPS NB,COMPARE N\n");
-   fprintf(file,"==== BASIC SORT =====\n");
+   // fprintf(file,"DATA SIZE,ITERATIONS,COUPS HORLOGE,SWAPS NB,COMPARE N\n");
+   // fprintf(file,"==== BASIC SORT =====\n");
    //BASIC SORT Remplissage
-   int data_size_index = 7;
-   int iterations_nb_index = 1;
+   int data_size_index = 20;
+   int iterations_nb_index = 1 ;
    for(j = 0; j < data_size_index; j++){
    		for(i = 0; i < iterations_nb_index; i++){
-   			p = evalue_performance(BASIC, data_size[j], iterations_nb[i]);
+   			p = evalue_performance(BASIC, data_size[j], iterations_nb[i], WORST);
    			record_performance(file,p);
    		}
    }
-   fprintf(file,"==== SELECTION SORT =====\n");
+   //fprintf(file,"==== SELECTION SORT =====\n");
     //SELECTION SORT Remplissage
    for(j = 0; j < data_size_index; j++){
    		for(i = 0; i < iterations_nb_index; i++){
-   			p = evalue_performance(SELECTION, data_size[j], iterations_nb[i]);
+   			p = evalue_performance(SELECTION, data_size[j], iterations_nb[i], WORST);
    			record_performance(file,p);
    		}
 
    }
 
-	fprintf(file,"==== BUBBLE SORT =====\n");
+	//fprintf(file,"==== BUBBLE SORT =====\n");
    //BUBBLE SORT Remplissage
    for(j = 0; j < data_size_index; j++){
    		for(i = 0; i < iterations_nb_index; i++){
-   			p = evalue_performance(BUBBLE, data_size[j], iterations_nb[i]);
+   			p = evalue_performance(BUBBLE, data_size[j], iterations_nb[i], WORST);
    			record_performance(file,p);
    		}
 
    }
-   fprintf(file,"==== INSERTION SORT =====\n");
+  // fprintf(file,"==== INSERTION SORT =====\n");
    //INSERTION SORT Remplissage
    for(j = 0; j < data_size_index; j++){
    		for(i = 0; i < iterations_nb_index; i++){
-   			p = evalue_performance(INSERTION, data_size[j], iterations_nb[i]);
+   			p = evalue_performance(INSERTION, data_size[j], iterations_nb[i], WORST);
    			record_performance(file,p);
    		}
 
    }
-   fprintf(file,"==== QUICK SORT =====\n");
+  // fprintf(file,"==== QUICK SORT =====\n");
    //QUICK SORT Remplissage
    for(j = 0; j < data_size_index; j++){
    		for(i = 0; i < iterations_nb_index; i++){
-   			p = evalue_performance(QUICK, data_size[j], iterations_nb[i]);
+   			p = evalue_performance(QUICK, data_size[j], iterations_nb[i], WORST);
    			record_performance(file,p);
    		}
 
    }
+
+   // fprintf(file,"==== MERGE SORT =====\n");
+   //MERGE SORT Remplissage
+   for(j = 0; j < data_size_index; j++){
+         for(i = 0; i < iterations_nb_index; i++){
+            p = evalue_performance(MERGE, data_size[j], iterations_nb[i], WORST);
+            record_performance(file,p);
+         }
+
+   }
+
    fclose(file);
 
    
