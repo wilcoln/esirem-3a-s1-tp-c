@@ -1,0 +1,32 @@
+function plot_all(data_size, basic, selection, bubble, insertion, quick, merge)
+subplot(2,3,1);
+plot(data_size, basic);
+title('Basic sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+subplot(2,3,2);
+plot(data_size, selection);
+title('Selection sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+subplot(2,3,3);
+plot(data_size, bubble);
+title('Bubble sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+subplot(2,3,4);
+plot(data_size, insertion);
+title('Insertion sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+subplot(2,3,5);
+plot(data_size, quick);
+title('Quick sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+subplot(2,3,6);
+plot(data_size, merge);
+title('Merge sort');
+ylabel('nombre de coups moyen');
+xlabel('data size');
+endfunction
