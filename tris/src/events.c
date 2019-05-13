@@ -1,3 +1,11 @@
+/********
+ * Name : events.c
+ * Author: Wilfried Bounsi & Ulrich Fonkoue TD2 TP3
+ * Description: contient les différentes fonctions demandées lors du TP et autres fonctions utilitaires
+ */
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -9,9 +17,6 @@
 const char MONTHS[12][10] = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
 extern compare_nb,swap_nb;
 extern clock_t coups_nb;
-//======================== Fin Constantes et variables externes ============================//
-
-
 
 
 //======================== Fonctions utilitaires ===========================================//
@@ -46,12 +51,17 @@ int numbify(date d){
 void stringify(date d, char date_str[]){
 	sprintf(date_str, "%d",numbify(d));
 }
-//======================== Fin Fonctions utilitaires =======================================//
+
+
+//===================== Fonctions principales ===================================
 
 /**
  * Name: genere_dates
- * @param : un enter {n}
- * Description: Génère aléatoirement n dates et renvoie un pointeur correspondant au tableau contenant ces dernières  
+ * @param : un enter {n} et un cas {cas}
+ * Description: Génère n dates et renvoie un pointeur correspondant au tableau contenant ces dernières 
+ * 				- si cas = RANDOM, les dates sont générées aléatoirement
+ * 				- si cas = BEST, les dates sont générées dans l'ordre croissant
+ * 				- si cas = WORST, les dates sont générées dans l'ordre décroissant
  */ 
 date* generate_dates(int n, Case cas){
 	srand(time(NULL));
@@ -87,18 +97,15 @@ date* generate_dates(int n, Case cas){
 				dates[i].year = (1999 + n) - i;
 			}
 		break;
-	}
-	
-	return dates;
-		
+	}	
+	return dates;		
 }
-
 
 /**
  * Name : create_events
  * @params : un entier {n} et un tableau d'évènements {events[]} préalablement alloué
  * Description: remplis le tableau events[] avec n évènements créés avec des dates aléatoires 
- */ 
+ */
 // void create_events(int n, event events[]){
 // 	int i;
 // 	char date_str[9];
@@ -111,6 +118,11 @@ date* generate_dates(int n, Case cas){
 // 	}
 // }
 
+/**
+ * Name : create_events (moidifié)
+ * @params : un entier {n}, un tableau d'évènements {events[]} préalablement alloué et un cas {cas}
+ * Description: remplis le tableau events[] avec n évènements créés avec des dates générés avec  un ordre dépendant du cas.
+ */
 void create_events(int n, event events[], Case cas){
 	int i;
 	char date_str[9];
@@ -135,7 +147,6 @@ void display_events(int n, event events[]){
 	}
 }
 
-//Renvoie  1 si d1 > d2, 0 si d1 = d2 et -1 si d1 >
 /**
  * Name : compare_dates
  * @params : deux dates {d1} et {d2}
@@ -159,9 +170,7 @@ int compare_dates(date d1, date d2){
  * @return : -1 si e1 est antérieur à e2, 0  si e1 a la même date que e2 et 1 si e1 est postérieur à e2
  */ 
 int compare_events(event e1, event e2){
-	// On incrémente le nombre global de comparaison
-	compare_nb++;
-
+	compare_nb++; // On incrémente le nombre global de comparaison
 	return compare_dates(e1.date_of_event, e2.date_of_event);
 }
 
@@ -183,7 +192,7 @@ void swap_events(event events[], int index1, int index2){
 /**
  * Name : min_array
  * @params : un tableau d'évènements {events[]} de taille {n} et  un entier {i}
- * Description : renvoie l'indice du plus petit élément du sous tableau commençant à l'indice i.
+ * Description : renvoie l'indice du plus petit élément du sous tableau events[i:].
  */ 
 int min_array(event events[], int n, int i){
 	int j,min_index=i;
@@ -195,7 +204,11 @@ int min_array(event events[], int n, int i){
 	return min_index;
 }
 
-
+/**
+ * Name : selection_sort
+ * @params : un tableau d'évènements {events[]} de taille {n}
+ * Description : tri le tableau selon le principe du tri par selection.
+ */ 
 void selection_sort(event events[], int n){
 	int i,j,min_index;
 	for(i = 0; i < n ; i++){
@@ -205,10 +218,25 @@ void selection_sort(event events[], int n){
 	}
 }
 
+/**
+ * Name : basic_sort
+ * @params : un tableau d'évènements {events[]} de taille {n}
+ * Description : tri le tableau selon le principe du tri basic, qui n'est en fait que le tri par selection.
+ */ 
 void basic_sort(event events[], int n){
-	selection_sort(events, n);
+	int i,j,min_index;
+	for(i = 0; i < n ; i++){
+		min_index = min_array(events, n, i);
+		if(min_index != i)
+			swap_events(events,min_index,i);
+	}
 }
 
+/**
+ * Name : bubble_sort
+ * @params : un tableau d'évènements {events[]} de taille {n}
+ * Description : tri le tableau selon le principe du tri bulle.
+ */ 
 void bubble_sort(event events[], int n){
 	short int permut = 1;
 	int i = 0;
@@ -224,7 +252,11 @@ void bubble_sort(event events[], int n){
 	
 }
 
-
+/**
+ * Name : insertion_sort
+ * @params : un tableau d'évènements {events[]} de taille {n}
+ * Description : tri le tableau selon le principe du tri insertion.
+ */ 
 void insertion_sort(event events[], int n){
 	int i,j,min_index;
 	event val;
@@ -239,12 +271,19 @@ void insertion_sort(event events[], int n){
 	}
 }
 
-
+/**
+ * Name : partition
+ * @params : un tableau d'évènements {events[]} un indice de début {a} et un indice de fin {b}
+ * @return : renvoie l'indice pivot du sous tableau events[a:b]
+ * Description : l'indice pivot est un indice du tableau pour lequel
+ * 				 - les éléments d'indice précédents sont plus petit (au sens large)
+ * 				 - les éléments d'indice suivants sont plus grands (au sens large)
+ */
 int partition(event events[], int a, int b){
-	int pivot = a;
+	/* int pivot = a; */
 	int i;
 	event tmp;
-	for(i = a + 1; i <= b; i++){
+	/* for(i = a + 1; i <= b; i++){
 		if(compare_events(events[pivot],events[i]) == 1){
 			tmp = events[i];
 			events[i] = events[pivot+1];
@@ -252,9 +291,25 @@ int partition(event events[], int a, int b){
 			events[pivot] = tmp;
 			pivot++;
 		}
+	} */
+	tmp = events[b];
+	int pivot = a-1;
+	for(i = a; i < b; i++){
+		if(compare_events(tmp,events[i]) == 1){
+			pivot++;
+			swap_events(events, pivot, i);
+		}
 	}
+	pivot++;
+	swap_events(events,pivot,b);
 	return pivot;
 }
+
+/**
+ * Name : quick_sort
+ * @params : un tableau d'évènements {events[]} un indice de début {a} et un indice de fin {b}
+ * Description : tri le sous tableau events[a:b] par le principe du tri rapide.
+ */
 void quick_sort(event events[], int a, int b){
 	if(b > a){
 		int pivot = partition(events,a,b);
@@ -263,6 +318,11 @@ void quick_sort(event events[], int a, int b){
 	}
 }
 
+/**
+ * Name : merge
+ * @params : un tableau d'évènements {events[]} un indice de début {a}, un indice intermédiare {c} et un indice de fin {b}
+ * Description : fusionne les sous tableaux events[a:c] et events[c+1:b], sous réserve qu'ils soient déjà triés.
+ */
 void merge(event events[], int a, int c, int b){
 	 int t1 = c-a+1;
 	 int t2 = b-c;
@@ -291,6 +351,11 @@ void merge(event events[], int a, int c, int b){
 	}
 }
 
+/**
+ * Name : merge_sort
+ * @params : un tableau d'évènements {events[]} un indice de début {a} et un indice de fin {b}
+ * Description : tri le sous tableau events[a:b] par le principe du tri fusion.
+ */
 void merge_sort(event events[], int a , int b){
 	if(b > a){
 		int mil = (a+b)/2;
@@ -301,90 +366,106 @@ void merge_sort(event events[], int a , int b){
 }
 
 
-//Evaluation des performances
-perf evalue_performance(Tri tri, int data_size, int iterations_nb, Case cas){
-	clock_t t1,t2, t[iterations_nb]; double ecart_type = 0;
-	char algo[128];
+/**
+ * Name : evalue_performance
+ * @params : - un type de tri {sort} pouvant être BASIC, SELECTION, BUBBLE, INSERTION, QUICK ou MERGE
+ * 			 -  une taille de donnée {data_size}
+ * 			 -  un nombre d'itération {itérations_nb}
+ * 			 -  un cas {cas}, pouvant être RANDOM, BEST ou WORST
+ * @return : renvoie la performance du tri sort sur un tableau de taille data_size,
+ * 			 après itérations_nb nombre d'itérations.
+ * Description: les tableaux sont générés pour correspondre au cas passé en paramètre
+ *           
+ */
+Perf evaluate_performance(Sort sort, int data_size, int iterations_nb, Case cas){
+	clock_t t1,t2, t_i; double ecart_type = 0;
+	char sort_name[128];
 	size_t i;
 	//Initialisation des compteurs
 	compare_nb = 0; swap_nb=0;
-	switch(tri){
+	switch(sort){
 		case BASIC:
-			strcpy(algo,"BASIC SORT");
+			strcpy(sort_name,"BASIC SORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
+				t_i = clock();
 				basic_sort(events,data_size);
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			};
 			t2 = clock();
 			break;
 		case SELECTION:
-			strcpy(algo,"SELECTION SORT");
+			strcpy(sort_name,"SELECTION SORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
+				t_i = clock();
 				basic_sort(events,data_size);
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			}
 			t2 = clock();
 			break;
 		case BUBBLE:
-			strcpy(algo,"BUBBLESORT");
+			strcpy(sort_name,"BUBBLESORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
+				t_i = clock();
 				bubble_sort(events,data_size);	
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			}
 			t2 = clock();
 			break;
 		case INSERTION:
-			strcpy(algo,"INSERTION SORT");
+			strcpy(sort_name,"INSERTION SORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
+				t_i = clock();
 				insertion_sort(events,data_size);
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			}
 			t2 = clock();
 			break;
 		case QUICK:
-			strcpy(algo,"QUICK SORT");
+			strcpy(sort_name,"QUICK SORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
+				t_i = clock();
 				quick_sort(events,0,data_size-1);
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			}
 			t2 = clock();
 			break;
 
 		case MERGE:
-			strcpy(algo,"MERGE SORT");
+			strcpy(sort_name,"MERGE SORT");
 			t1 = clock();
 			for(i=0;i<iterations_nb;i++){
 				event events[data_size];
 				create_events(data_size,events, cas);
-				quick_sort(events,0,data_size-1);
-				t[i] = clock();
-				ecart_type +=t[i]*t[i];
+				t_i = clock();
+				merge_sort(events,0,data_size-1);
+				t_i = clock() - t_i;
+				ecart_type +=t_i*t_i;
 			}
 			t2 = clock();
 			break;
 			
 	}
-	perf new_perf;
+	Perf new_perf;
 	new_perf.data_size = data_size;
 	new_perf.iterations_nb = iterations_nb;
 	new_perf.coups_nb  = (t2-t1)/iterations_nb;
@@ -395,22 +476,33 @@ perf evalue_performance(Tri tri, int data_size, int iterations_nb, Case cas){
 	ecart_type -= new_perf.coups_nb;
 	ecart_type = sqrt(ecart_type);
 	new_perf.ecart_type = ecart_type;
-	strcpy(new_perf.algo, algo);
+	strcpy(new_perf.sort_name, sort_name);
 	return new_perf;
 	
 }
-void display_performance(perf p){
-	printf("Affichage perf ...\n");
-	printf("> Temps mis par le tri %s avec une taille %d et un nb d'itération %d \n\t %ld coups, %lf ecart_type, nb_swap = %d, nb_compare = %d\n\n", p.algo,  p.data_size, p.iterations_nb, p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
-	printf("Fin perf\n");
+
+/**
+ * Name : display_performance
+ * @params : une performance {Perf}
+ * Description: Affiche la performance dans le terminal.        
+ */
+void display_performance(Perf p){
+	printf("Affichage Perf ...\n");
+	printf("> Performance du tri %s avec une taille %d et un nb d'itération %d \n\t %ld coups, %lf ecart_type, nb_swap = %d, nb_compare = %d\n\n", p.sort_name,  p.data_size, p.iterations_nb, p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
+	printf("Fin Perf\n");
 }
-void record_performance(FILE* file,perf p){
+
+/**
+ * Name : record_perforamnce
+ * @params : Un pointeur vers un fichier {file} et une performance {Perf}
+ * Description: Enregistre la performance Perf dans le fichier pointé par file.        
+ */
+void record_performance(FILE* file,Perf p){
    if(file == NULL)
    {
       printf("Error!");   
       exit(1);             
    }
-   //fprintf(file,"%s,%d,%d,%ld,%d,%d\n",p.algo,p.data_size,p.iterations_nb,p.coups_nb,p.swap_nb,p.compare_nb);
-   fprintf(file, "%d,%d,%ld,%lf,%d,%d\n",p.data_size,p.iterations_nb,p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
+   fprintf(file,"%s,%d,%d,%ld,%lf,%d,%d\n",p.sort_name,p.data_size,p.iterations_nb,p.coups_nb, p.ecart_type, p.swap_nb,p.compare_nb);
 }
 
